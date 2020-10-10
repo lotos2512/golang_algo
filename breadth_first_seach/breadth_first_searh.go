@@ -11,7 +11,7 @@ type Workable interface {
 
 type Friendly interface {
 	GetFriends() []WorkableFriendly
-	Add(f WorkableFriendly)
+	Add(f WorkableFriendly) error
 }
 
 type WorkableFriendly interface {
@@ -43,8 +43,9 @@ func (f *Friend) GetFriends() []WorkableFriendly {
 	return f.friends
 }
 
-func (f *Friend) Add(friend WorkableFriendly) {
+func (f *Friend) Add(friend WorkableFriendly) error {
 	f.friends = append(f.friends, friend)
+	return nil
 }
 
 func (t *Trader) Work() {

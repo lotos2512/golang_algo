@@ -1,6 +1,7 @@
 package common
 
 func transposition(items [][]int) [][]int {
+
 	h := len(items[0])
 	w := len(items)
 	if h != w {
@@ -13,7 +14,7 @@ func transposition(items [][]int) [][]int {
 		items = newMatrix
 	} else {
 		for i := 0; i < h; i++ {
-			for j := i+1; j < w; j++ {
+			for j := i + 1; j < w; j++ {
 				v := items[i][j]
 				items[i][j] = items[j][i]
 				items[j][i] = v

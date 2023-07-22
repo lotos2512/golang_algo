@@ -115,6 +115,14 @@ func searchBestWay(start, end *Node, priceTable PriceTable) {
 	}
 }
 
+func (pt PriceTable) GetData(nodeName string) (priceData *TableData) {
+	v, ok := pt[nodeName]
+	if !ok {
+		return
+	}
+	return v
+}
+
 func (pt PriceTable) getNotReadyNode(end *Node) *Node {
 	// Создаем приоритетную очередь (минимальную кучу) для узлов
 	pq := make(PriorityQueue, 0)

@@ -35,6 +35,13 @@ func (n *Node) SetRelation(relation Relation) {
 }
 
 func SearchBestWay(start, end *Node) (result Result) {
+	if start == end {
+		return Result{
+			Nodes: []*Node{start},
+			Price: 0,
+		}
+	}
+
 	priceTable := make(PriceTable)
 
 	priceTable[start.Name] = &TableData{
@@ -140,6 +147,8 @@ func (pt PriceTable) getNotReadyNode(end *Node) *Node {
 
 		// Если узел не равен конечному узлу и его стоимость меньше бесконечности, возвращаем его
 		if minNodeData.node != end && minNodeData.price < Price(1<<63-1) {
+			// Установим узлу признак того, что он уже обработан
+			minNodeData.end = true
 			return minNodeData.node
 		}
 	}
@@ -150,11 +159,9 @@ func (pt PriceTable) getNotReadyNode(end *Node) *Node {
 // Дополнительные структуры для реализации минимальной кучи
 type PriorityQueue []*TableData
 
-func (pq PriorityQueue) Len() int { return len(pq) }
-
+func (pq PriorityQueue) Len() int           { return len(pq) }
 func (pq PriorityQueue) Less(i, j int) bool { return pq[i].price < pq[j].price }
-
-func (pq PriorityQueue) Swap(i, j int) { pq[i], pq[j] = pq[j], pq[i] }
+func (pq PriorityQueue) Swap(i, j int)      { pq[i], pq[j] = pq[j], pq[i] }
 
 func (pq *PriorityQueue) Push(x interface{}) {
 	item := x.(*TableData)

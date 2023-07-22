@@ -161,3 +161,100 @@ func TestSearchBestWayMToE(t *testing.T) {
 		Price: 20,
 	})
 }
+
+func TestSearchBestWay(t *testing.T) {
+	A := &Node{Name: "A"}
+	B := &Node{Name: "B"}
+	C := &Node{Name: "C"}
+	D := &Node{Name: "D"}
+
+	A.SetRelation(Relation{Node: B, Price: 5})
+	A.SetRelation(Relation{Node: C, Price: 7})
+	B.SetRelation(Relation{Node: C, Price: 2})
+	C.SetRelation(Relation{Node: D, Price: 3})
+
+	tests := []struct {
+		name     string
+		start    *Node
+		end      *Node
+		expected Result
+	}{
+		{
+			name:  "Path from A to D",
+			start: A,
+			end:   D,
+			expected: Result{
+				Nodes: []*Node{D, C, B, A},
+				Price: 10,
+			},
+		},
+		{
+			name:  "Path from A to C",
+			start: A,
+			end:   C,
+			expected: Result{
+				Nodes: []*Node{C, B, A},
+				Price: 7,
+			},
+		},
+		{
+			name:  "Path from A to A",
+			start: A,
+			end:   A,
+			expected: Result{
+				Nodes: []*Node{A},
+				Price: 0,
+			},
+		},
+		{
+			name:  "Path from B to D",
+			start: B,
+			end:   D,
+			expected: Result{
+				Nodes: []*Node{D, C, B},
+				Price: 5,
+			},
+		},
+		{
+			name:  "Path from C to A",
+			start: C,
+			end:   A,
+			expected: Result{
+				Nodes: nil, // Нет пути от C до A
+				Price: 0,
+			},
+		},
+		{
+			name:  "No Path from D to A",
+			start: D,
+			end:   A,
+			expected: Result{
+				Price: 0,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		result := SearchBestWay(test.start, test.end)
+
+		// Проверка длины пути и стоимости
+		if result.Price != test.expected.Price {
+			t.Errorf("[%s] Некорректная стоимость пути. Ожидаемый результат: %d, полученный результат: %d",
+				test.name, test.expected.Price, result.Price)
+		}
+
+		// Проверка последовательности узлов
+		if len(result.Nodes) != len(test.expected.Nodes) {
+			t.Errorf("[%s] Некорректная последовательность узлов. Ожидаемый результат: %v, полученный результат: %v",
+				test.name, test.expected.Nodes, result.Nodes)
+		} else {
+			for i, node := range result.Nodes {
+				if node.Name != test.expected.Nodes[i].Name {
+					t.Errorf("[%s] Некорректная последовательность узлов. Ожидаемый результат: %v, полученный результат: %v",
+						test.name, test.expected.Nodes, result.Nodes)
+					break
+				}
+			}
+		}
+	}
+}

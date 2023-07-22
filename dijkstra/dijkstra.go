@@ -1,17 +1,23 @@
 package dijkstra
 
+import (
+	"container/heap"
+)
+
 type Price uint64
 
 type Node struct {
 	Name      string
 	Relations []Relation
 }
+
 type TableData struct {
 	node  *Node
 	price Price
 	from  *Node
 	end   bool
 }
+
 type PriceTable map[string]*TableData
 
 type Relation struct {
@@ -102,35 +108,55 @@ func searchBestWay(start, end *Node, priceTable PriceTable) {
 		startPrice.end = true
 
 		if minIndex > len(start.Relations)-1 || end == start.Relations[minIndex].Node {
-			start = priceTable.getNotReadyNode(end, priceTable)
+			start = priceTable.getNotReadyNode(end)
 		} else {
 			start = start.Relations[minIndex].Node
 		}
 	}
 }
 
-func (pt PriceTable) getNotReadyNode(end *Node, priceTable PriceTable) (node *Node) {
-	endPrice := priceTable.GetData(end.Name)
-	if endPrice != nil {
-		for _, v := range pt {
-			if !v.end && v.price < endPrice.price {
-				return v.node
-			}
-		}
-	} else {
-		for _, v := range pt {
-			if !v.end && v.node != end {
-				return v.node
-			}
+func (pt PriceTable) getNotReadyNode(end *Node) *Node {
+	// Создаем приоритетную очередь (минимальную кучу) для узлов
+	pq := make(PriorityQueue, 0)
+
+	// Инициализируем очередь данными из таблицы цен
+	for _, v := range pt {
+		if !v.end {
+			heap.Push(&pq, v)
 		}
 	}
-	return
+
+	for pq.Len() > 0 {
+		// Извлекаем узел с минимальной стоимостью из очереди
+		minNodeData := heap.Pop(&pq).(*TableData)
+
+		// Если узел не равен конечному узлу и его стоимость меньше бесконечности, возвращаем его
+		if minNodeData.node != end && minNodeData.price < Price(1<<63-1) {
+			return minNodeData.node
+		}
+	}
+
+	return nil // Если все узлы уже обработаны или цена всех узлов равна бесконечности
 }
 
-func (pt PriceTable) GetData(nodeName string) (priceData *TableData) {
-	v, ok := pt[nodeName]
-	if !ok {
-		return
-	}
-	return v
+// Дополнительные структуры для реализации минимальной кучи
+type PriorityQueue []*TableData
+
+func (pq PriorityQueue) Len() int { return len(pq) }
+
+func (pq PriorityQueue) Less(i, j int) bool { return pq[i].price < pq[j].price }
+
+func (pq PriorityQueue) Swap(i, j int) { pq[i], pq[j] = pq[j], pq[i] }
+
+func (pq *PriorityQueue) Push(x interface{}) {
+	item := x.(*TableData)
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	*pq = old[0 : n-1]
+	return item
 }

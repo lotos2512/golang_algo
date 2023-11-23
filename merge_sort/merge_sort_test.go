@@ -23,7 +23,12 @@ func Test_mergeSort(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOutput := mergeSort(tt.args.input); !reflect.DeepEqual(gotOutput, tt.wantOutput) {
+			gotOutput := mergeSort(tt.args.input)
+			if !reflect.DeepEqual(gotOutput, tt.wantOutput) {
+				t.Errorf("mergeSort() = %v, want %v", gotOutput, tt.wantOutput)
+			}
+			gotOutput = insertSort(tt.args.input)
+			if !reflect.DeepEqual(gotOutput, tt.wantOutput) {
 				t.Errorf("mergeSort() = %v, want %v", gotOutput, tt.wantOutput)
 			}
 		})
